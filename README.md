@@ -69,17 +69,17 @@ part is described in the following views subsection.
 
 First the application is created and configured and connected with SQLAchemy
 
-https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/7da80fd71ffea416df06690a198d9199135e5c97/app.py#L10-L17
+https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/1c5963f1fc3d30dab7819f8642a621c7cc09dc0e/app.py#L10-L17
 
 Then the two *parent* and *child* models are defined as shown in the SQLAlchemy
 documentation
 
-https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/7da80fd71ffea416df06690a198d9199135e5c97/app.py#L20-L35
+https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/1c5963f1fc3d30dab7819f8642a621c7cc09dc0e/app.py#L20-L35
 
 and a third *related* model is added to store the selections from the form with
 related, or cascading, fields described at point 2. above
 
-https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/7da80fd71ffea416df06690a198d9199135e5c97/app.py#L38-L44
+https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/1c5963f1fc3d30dab7819f8642a621c7cc09dc0e/app.py#L38-L44
 
 ### The views
 
@@ -103,7 +103,7 @@ checkbox:
 
 Easily done than said:
 
-https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/7da80fd71ffea416df06690a198d9199135e5c97/app.py#L47-L60
+https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/1c5963f1fc3d30dab7819f8642a621c7cc09dc0e/app.py#L47-L60
 
 #### Cascading fields
 
@@ -120,7 +120,7 @@ This goal requires a bit more effort. The idea is to build a form where:
 
 Let's start with the attributes part of the view
 
-https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/7da80fd71ffea416df06690a198d9199135e5c97/app.py#L81-L90
+https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/1c5963f1fc3d30dab7819f8642a621c7cc09dc0e/app.py#L81-L90
 
 Here the interesting part is the definition of `form_columns` [line 83] where
 `related_child` substitutes `child`; since such field has no counterpart in the
@@ -137,7 +137,7 @@ that we are about to see now.
 
 The code for `AjaxRelatedChildLoader` is trivial
 
-https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/7da80fd71ffea416df06690a198d9199135e5c97/app.py#L63-L78
+https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/1c5963f1fc3d30dab7819f8642a621c7cc09dc0e/app.py#L63-L78
 
 remember that this has to provide to the Ajax call a list of *child* related to
 the queried *parent*. This is the reason why in overriding `get_one` we use the
@@ -146,7 +146,7 @@ the queried *parent*. This is the reason why in overriding `get_one` we use the
 related to the parent that the Ajax call will put in the `query` parameter as
 show in 
 
-https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/7da80fd71ffea416df06690a198d9199135e5c97/static/related_form.js#L2-L25
+https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/1c5963f1fc3d30dab7819f8642a621c7cc09dc0e/static/related_form.js#L2-L25
 
 Again the relevant parts are is definition of the `on-change` handler [line 4].
 The Ajax call is based on the `$parent_id` extracted [line 8] from the *parent*
@@ -161,7 +161,7 @@ What remains to be done is to connect the value of the *related child* form
 field to the *child* attribute of the model. This is done in Python by
 overriding two methods of the view
 
-https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/7da80fd71ffea416df06690a198d9199135e5c97/app.py#L92-L102
+https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/1c5963f1fc3d30dab7819f8642a621c7cc09dc0e/app.py#L92-L102
 
 As its name suggests `on_form_prefill` is called once the edit form has been
 scaffolded and some values are yet to be filled; in our case we need to fill
@@ -177,9 +177,9 @@ create) overriding `on_model_change` allows us to set `model.child_id` from the
 Once the views are defined, it's enough to instantiate the administrative
 backend and to add to it the views
 
-https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/7da80fd71ffea416df06690a198d9199135e5c97/app.py#L105-L113
+https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/1c5963f1fc3d30dab7819f8642a621c7cc09dc0e/app.py#L105-L113
 
 Finally, to show some data when the application starts, few records are used to
 prepopulate each model
 
-https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/7da80fd71ffea416df06690a198d9199135e5c97/app.py#L105-L113
+https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/1c5963f1fc3d30dab7819f8642a621c7cc09dc0e/app.py#L115-L128
