@@ -96,6 +96,59 @@ https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/f06e6
 
 #### Cascading fields
 
+This goal requires a bit more effort. The idea is to build a form where:
+
+* the *parent* select field is handled by Flask-Admin,
+* the *related child* extra select field is a `Select2Field` handled by Flask-Admin,
+* some custom Javascript code uses Ajax to populate the *related child* choices when the *parent* changes,
+* the Ajax endpoint is probided by subclassing `AjaxModelLoader`,
+* some custom Python code is added to connect the value of the *related child* form field to the model attribute.
+
+Let's start with the attributes part of the view
+
+https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/8dee25a724e039a8de53a725afa48d03ff1adc4b/app.py#L81-L90
+
+Here the interesting part is the definition of `form_columns` in line 83 where `related_child` substitutes `child`; since such field has no counterpart in the model, it is added as a `form_extra_fields` in line 84, where it is defined as a `Select2Field`. Pay attention to the parameters `choices` and `allow_blank` (so defined because the select will be filled dynamically by the custom Javascript) and `validate_choice` that is set to `False` as suggested in [Skipping choice validation:](https://wtforms.readthedocs.io/en/2.3.x/fields/#wtforms.fields.SelectField).
+
+Finally we need to configure the view so that it will automatically scaffold a
+endpoint to answer Ajax queries, this is done setting `form_ajax_refs` to a
+subclass of `AjaxModelLoader` and adding some some `extra_js` in line 90 that we are about to see now.
+
+The code for `AjaxRelatedChildLoader` is trivial
+
+https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/8dee25a724e039a8de53a725afa48d03ff1adc4b/app.py#L63-L78
+
+remember that this has to provide to the Ajax call a list of *child* related to
+the queried *parent*. This is the reason why in overriding `get_one` we use the
+`Child` model in line 73 and in overriding `get_list` we use
+`filter_by(parent_id=query)` to restrict the list of children to the ones
+related to the parent that the Ajax call will put in the `query` parameter as show in 
+
+https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/8dee25a724e039a8de53a725afa48d03ff1adc4b/static/related_form.js#L2-L25
+
+Again the relevant parts are the definition of the `on-change` handler in line 4
+that, based on how the `$parent_id` is extracted in line 8 from the *parent*
+field handled by Flask-Admin and then used as the `query` parameter in line 10
+by the Ajax call to the endpoint (that Flask-Admin generates due the the
+`form_ajax_refs` configuration in the view) indicated in line 7, with the name
+given in line 9. The callback for the Ajax call in lines 12-23 receives the data
+and uses it to populate the select field (once reset to the single empty option)
+and triggers a change event so that the browser can update the form.
+
+What remains to be done is to connect the value of the *related child* form
+field to the *child* attribute of the model. This is done in Python by
+overriding two methods of the view
+
+https://github.com/mapio/Flask-Admin-Inline-Models-And-Related-Fields/blob/8dee25a724e039a8de53a725afa48d03ff1adc4b/app.py#L92-L102
+
+As its name suggests `on_form_prefill` is called once the edit form has been
+scaffolded and some values are yet to be filled; in our case we need to fill
+`form.related_child` with the possible `choiices` obtained from the model via
+`model.parent.children` (the siblings, so to say, of the current choice) and the
+`data` with the current selected *child*. On the other end, once the form has
+been submitted and a change in the model has been detected (due to an edit, or a
+create) overriding `on_model_change` allows us to set `model.child_id` from the
+`form.related_child.data` value.
 
 ### Putting things together
 
